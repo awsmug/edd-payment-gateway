@@ -54,6 +54,13 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	protected $show_cc_form = true;
 
 	/**
+	 * Function for setting up payment gateway.
+	 *
+	 * @since 1.0.0
+	 */
+	abstract protected function setup();
+
+	/**
 	 * Running necessary scripts.
 	 *
 	 * @throws Payment_Exception Exception if name or slug is missng.Payment_Exception
@@ -61,6 +68,8 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 * @since 1.0.0
 	 */
 	public function run() {
+		$this->setup();
+
 		if( empty( $this->name ) || empty( $this->slug ) ) {
 			throw new Payment_Exception( 'Payment gateway name or slug must not be empty.' );
 		}
