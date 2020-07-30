@@ -1,5 +1,5 @@
 {
-  "name": "awsm/edd-payment",
+  "name": "awsm/edd-payment-gateway",
   "description": "Edd payment class for inheritance in payment gateways.",
   "version": "1.0.0-beta-1",
   "license": "GPL-2.0-or-later",
