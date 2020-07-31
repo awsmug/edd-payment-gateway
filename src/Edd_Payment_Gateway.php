@@ -80,7 +80,8 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 			'verify_nonce',
 			'process_purchase',
 			'process_payment_notification',
-			'register_gateway_settings',
+			'register_section',
+			'register_settings',
 		]);
 
 		$this->add_actions();
@@ -107,8 +108,8 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 		add_action( 'init', array( $this, 'process_payment_notification' ) );
 
 		if ( is_admin() && $this->has_settings() ) {
-			add_action( 'edd_settings_sections_gateways', array( $this, 'register_gateway_section' ) );
-			add_action( 'edd_settings_gateways', array( $this, 'register_gateway_settings' ) );
+			add_action( 'edd_settings_sections_gateways', array( $this, 'register_section' ) );
+			add_action( 'edd_settings_gateways', array( $this, 'register_settings' ) );
 		}
 
 		if ( ! $this->show_cc_form ) {
@@ -138,7 +139,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 *
 	 * @since 1.0.0
 	 */
-	public function register_gateway_section( $gateway_sections ) {
+	private function register_section( $gateway_sections ) {
 		$gateway_sections[ $this->slug ] = $this->name;
 		return $gateway_sections;
 	}
@@ -152,7 +153,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 *
 	 * @since 1.0.0
 	 */
-	protected function register_gateway_settings( array $settings ) :array {
+	protected function register_settings( array $settings ) :array {
 		return $settings;
 	}
 
@@ -164,7 +165,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 * @since 1.0.0
 	 */
 	protected function has_settings() {
-		if( count( $this->register_gateway_settings( [] ) ) === 0 ) {
+		if( count( $this->register_settings( [] ) ) === 0 ) {
 			return false;
 		}
 
