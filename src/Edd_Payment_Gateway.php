@@ -159,6 +159,11 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 			add_action( 'edd_settings_gateways', array( $this, 'register_settings' ) );
 		}
 
+		if ( edd_is_checkout() ) {
+			add_action( 'edd_purchase_form_before_register_login', array( $this, 'checkout_html' ) );
+			add_action( 'wp_enqueue_scripts', array( $this, 'checkout_scripts' ) );
+		}
+
 		if ( ! $this->show_cc_form ) {
 			add_action( 'edd_' . $this->slug . '_cc_form', '__return_false' );
 		}
@@ -218,6 +223,23 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 
 		return true;
 	}
+
+	/**
+	 * Checkout HTML.
+	 *
+	 * @since 1.0.0
+	 */
+	protected function checkout_html() {
+	}
+
+	/**
+	 * Checkout Scripts.
+	 *
+	 * @since 1.0.0
+	 */
+	protected function checkout_scripts() {
+	}
+
 
 	/**
 	 * Nonce verification.
