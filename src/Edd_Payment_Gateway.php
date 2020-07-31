@@ -80,6 +80,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 			'verify_nonce',
 			'process_purchase',
 			'process_payment_notification',
+			'register_gateway_settings',
 		]);
 
 		$this->add_actions();
@@ -92,7 +93,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 * @since 1.0.0
 	 */
 	public function add_filters() {
-		\add_filter( 'edd_payment_gateways', array( $this, 'add_gateway' ) );
+		add_filter( 'edd_payment_gateways', array( $this, 'add_gateway' ) );
 	}
 
 	/**
@@ -101,12 +102,17 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 * @since 1.0.0
 	 */
 	public function add_actions() {
-		\add_action( 'edd_gateway_' . $this->slug, array( $this, 'verify_nonce' ), 1 );
-		\add_action( 'edd_gateway_' . $this->slug, array( $this, 'process_purchase' ) );
-		\add_action( 'init', array( $this, 'process_payment_notification' ) );
+		add_action( 'edd_gateway_' . $this->slug, array( $this, 'verify_nonce' ), 1 );
+		add_action( 'edd_gateway_' . $this->slug, array( $this, 'process_purchase' ) );
+		add_action( 'init', array( $this, 'process_payment_notification' ) );
+
+		if ( is_admin() && $this->has_settings() ) {
+			add_action( 'edd_settings_sections_gateways', array( $this, 'register_gateway_section' ) );
+			add_action( 'edd_settings_gateways', array( $this, 'register_gateway_settings' ) );
+		}
 
 		if ( ! $this->show_cc_form ) {
-			\add_action( 'edd_' . $this->slug . '_cc_form', '__return_false' );
+			add_action( 'edd_' . $this->slug . '_cc_form', '__return_false' );
 		}
 	}
 
@@ -119,9 +125,50 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 *
 	 * @since 1.0.0
 	 */
-	private function add_gateway( array $gateways ) {
+	private function add_gateway( array $gateways ) : array {
 		$gateways[ $this->slug ] = $this->gateway_args;
 		return $gateways;
+	}
+
+	/**
+	 * Register the payment gateways setting section.
+	 *
+	 * @param  array $gateway_sections Array of sections for the gateways tab.
+	 * @return array                   Added Amazon Payments into sub-sections.
+	 *
+	 * @since 1.0.0
+	 */
+	public function register_gateway_section( $gateway_sections ) {
+		$gateway_sections[ $this->slug ] = $this->name;
+		return $gateway_sections;
+	}
+
+	/**
+	 * Register gateway settings.
+	 *
+	 * @param array $settings Gateway settings.
+	 *
+	 * @return array Filtered gateway settings.
+	 *
+	 * @since 1.0.0
+	 */
+	protected function register_gateway_settings( array $settings ) :array {
+		return $settings;
+	}
+
+	/**
+	 * Check if the gateway has settings.
+	 *
+	 * @return bool True if there are settings, false if not.
+	 *
+	 * @since 1.0.0
+	 */
+	protected function has_settings() {
+		if( count( $this->register_gateway_settings( [] ) ) === 0 ) {
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -163,8 +210,6 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 */
 	public abstract function process_payment( array $purchase_data, int $payment_id );
 
-
-
 	/**
 	 * Listening to incoming requests.
 	 *
@@ -183,7 +228,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	}
 
 	/**
-	 * Process payment notifications.
+	 * Payment listener.
 	 *
 	 * @param array $input Incoming data.
 	 *
@@ -243,8 +288,8 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 * Payment complete.
 	 *
 	 * @param int  $payment_id     Payment id.
-	 * @param null $transaction_id Transaction id.
-	 * @param null $redirect_to    Redirect url.
+	 * @param int $transaction_id Transaction id.
+	 * @param int $redirect_to    Redirect url.
 	 *
 	 * @since 1.0.0
 	 */
