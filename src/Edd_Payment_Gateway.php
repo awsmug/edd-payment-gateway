@@ -54,11 +54,57 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	protected $show_cc_form = true;
 
 	/**
+	 * Gateway settings.
+	 *
+	 * @var array
+	 *
+	 * @since 1.0.0
+	 */
+	private $settings = array();
+
+	/**
 	 * Function for setting up payment gateway.
 	 *
 	 * @since 1.0.0
 	 */
-	abstract protected function setup();
+	protected function init_settings () {
+		if ( ! $this->has_settings() ) {
+			return;
+		}
+
+		foreach ( $this->settings_fields() AS $field_name => $field ) {
+			if ( $field['type'] === 'header' || $field['type'] === 'descriptive_text' ) {
+				continue;
+			}
+			$this->settings[ $field_name ] = edd_get_option( $field_name, '' );
+		}
+	}
+
+	/**
+	 * Get setting.
+	 *
+	 * @param string $name Name of setting.
+	 *
+	 * @return bool|mixed
+	 *
+	 * @since 1.0.0
+	 */
+	public function get_setting( $name ) {
+		if ( ! array_key_exists( $name, $this->settings ) ) {
+			return false;
+		}
+
+		return $this->settings[ $name ];
+	}
+
+	/**
+	 * Setting up payment gateway.
+	 *
+	 * @return mixed
+	 *
+	 * @since 1.0.0
+	 */
+	protected abstract function setup();
 
 	/**
 	 * Running necessary scripts.
@@ -68,6 +114,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 * @since 1.0.0
 	 */
 	public function run() {
+		$this->init_settings();
 		$this->setup();
 
 		if( empty( $this->name ) || empty( $this->slug ) ) {
@@ -145,7 +192,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	}
 
 	/**
-	 * Register gateway settings.
+	 * Settings fields.
 	 *
 	 * @param array $settings Gateway settings.
 	 *
@@ -153,7 +200,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 *
 	 * @since 1.0.0
 	 */
-	protected function register_settings( array $settings ) :array {
+	protected function settings_fields( array $settings ) : array {
 		return $settings;
 	}
 
