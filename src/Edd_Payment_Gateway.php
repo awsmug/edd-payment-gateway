@@ -51,7 +51,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 *
 	 * @since 1.0.0
 	 */
-	protected $show_cc_form = false;
+	protected $show_form = false;
 
 	/**
 	 * Gateway settings.
@@ -159,7 +159,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 			add_action( 'edd_settings_gateways', array( $this, 'register_settings' ) );
 		}
 
-		if ( edd_is_checkout() && $this->show_cc_form ) {
+		if ( edd_is_checkout() && $this->show_form ) {
 			add_action( 'edd_' . $this->slug . '_cc_form', array( $this, 'checkout_html' ) );
 			add_action( 'wp_enqueue_scripts', array( $this, 'checkout_scripts' ) );
 		} elseif ( edd_is_checkout() ) {
