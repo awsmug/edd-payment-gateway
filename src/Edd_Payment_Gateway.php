@@ -27,6 +27,24 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	protected $name = '';
 
 	/**
+	 * Shown name in admin. Gets $name if not set.
+	 *
+	 * @var string
+	 *
+	 * @since 1.0.0
+	 */
+	protected $admin_label = '';
+
+	/**
+	 * Shown name in checkout. Gets $name if not set.
+	 *
+	 * @var string
+	 *
+	 * @since 1.0.0
+	 */
+	protected $checkout_label = '';
+
+	/**
 	 * Gateway slug.
 	 *
 	 * @var string
@@ -34,15 +52,6 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 * @since 1.0.0
 	 */
 	protected $slug;
-
-	/**
-	 * Gateway arguments.
-	 *
-	 * @var array
-	 *
-	 * @since 1.0.0
-	 */
-	protected $gateway_args = array();
 
 	/**
 	 * Show credit card forms.
@@ -173,8 +182,24 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 * @since 1.0.0
 	 */
 	private function add_gateway( array $gateways ) : array {
-		$gateways[ $this->slug ] = $this->gateway_args;
+		$gateways[ $this->slug ] = $this->get_args();
 		return $gateways;
+	}
+
+	/**
+	 * Get gateway args.
+	 *
+	 * @return array Gateway arguments.
+	 *
+	 * @since 1.0.0
+	 */
+	private function get_args(){
+		$args = [
+			'admin_label' => empty( $this->admin_label ) ? $this->name: $this->admin_label,
+			'checkout_label' => empty( $this->checkout_label ) ? $this->name: $this->checkout_label,
+		];
+
+		return $args;
 	}
 
 	/**
