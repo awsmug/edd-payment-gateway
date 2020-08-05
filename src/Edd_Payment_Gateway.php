@@ -132,13 +132,14 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 
 		$this->set_hookable_hidden_methods([
 			'add_gateway',
+			'checkout_html',
 			'init',
 			'listener',
-			'verify_nonce',
 			'process_purchase',
 			'process_payment_notification',
 			'register_section',
 			'register_settings',
+			'verify_nonce',
 		]);
 
 		$this->add_actions();
