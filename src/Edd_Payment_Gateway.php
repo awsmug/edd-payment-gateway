@@ -203,7 +203,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 *
 	 * @since 1.0.0
 	 */
-	protected function settings_fields( array $settings ) : array {
+	protected function settings_fields( array $settings = array() ) : array {
 		return $settings;
 	}
 
