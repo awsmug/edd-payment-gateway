@@ -249,7 +249,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 * @since 1.0.0
 	 */
 	protected function has_settings() {
-		if( count( $this->settings_fields( [] ) ) === 0 ) {
+		if( count( $this->settings_fields() ) === 0 ) {
 			return false;
 		}
 
