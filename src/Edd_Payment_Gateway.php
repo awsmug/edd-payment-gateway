@@ -170,7 +170,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 
 		if ( is_admin() && $this->has_settings() ) {
 			add_action( 'edd_settings_sections_gateways', array( $this, 'register_section' ) );
-			add_action( 'edd_settings_gateways', array( $this, 'register_settings' ) );
+			add_action( 'edd_settings_gateways', array( $this, 'settings_fields' ) );
 		}
 	}
 
@@ -249,7 +249,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 * @since 1.0.0
 	 */
 	protected function has_settings() {
-		if( count( $this->register_settings( [] ) ) === 0 ) {
+		if( count( $this->settings_fields( [] ) ) === 0 ) {
 			return false;
 		}
 
