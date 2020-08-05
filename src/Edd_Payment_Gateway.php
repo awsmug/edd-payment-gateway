@@ -157,13 +157,9 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 		if ( is_admin() && $this->has_settings() ) {
 			add_action( 'edd_settings_sections_gateways', array( $this, 'register_section' ) );
 			add_action( 'edd_settings_gateways', array( $this, 'register_settings' ) );
-		}
-
-		if ( edd_is_checkout() && $this->show_form ) {
+		} else if ( edd_is_checkout() && $this->show_form ) {
 			add_action( 'edd_' . $this->slug . '_cc_form', array( $this, 'checkout_html' ) );
 			add_action( 'wp_enqueue_scripts', array( $this, 'checkout_scripts' ) );
-		} elseif ( edd_is_checkout() ) {
-			add_action( 'edd_' . $this->slug . '_cc_form', '__return_false' );
 		}
 	}
 
