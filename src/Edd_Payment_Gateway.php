@@ -160,10 +160,12 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 * @since 1.0.0
 	 */
 	public function add_actions() {
-		add_action( 'edd_gateway_' . $this->slug, array( $this, 'verify_nonce' ), 1 );
-		add_action( 'edd_gateway_' . $this->slug, array( $this, 'process_purchase' ) );
 		add_action( 'plugins_loaded', array( $this, 'init' ), 1 );
 		add_action( 'init', array( $this, 'process_payment_notification' ) );
+
+		add_action( 'edd_gateway_' . $this->slug, array( $this, 'verify_nonce' ), 1 );
+		add_action( 'edd_gateway_' . $this->slug, array( $this, 'process_purchase' ) );
+		add_action( 'edd_' . $this->slug . '_cc_form', array( $this, 'checkout_html' ) );
 
 		if ( is_admin() && $this->has_settings() ) {
 			add_action( 'edd_settings_sections_gateways', array( $this, 'register_section' ) );
@@ -178,7 +180,6 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 */
 	private function init(){
 		if ( edd_is_checkout() && $this->show_form ) {
-			add_action( 'edd_' . $this->slug . '_cc_form', array( $this, 'checkout_html' ) );
 			add_action( 'wp_enqueue_scripts', array( $this, 'checkout_scripts' ) );
 		}
 	}
