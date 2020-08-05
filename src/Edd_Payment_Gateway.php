@@ -132,6 +132,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 
 		$this->set_hookable_hidden_methods([
 			'add_gateway',
+			'init',
 			'listener',
 			'verify_nonce',
 			'process_purchase',
@@ -161,8 +162,16 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	public function add_actions() {
 		add_action( 'edd_gateway_' . $this->slug, array( $this, 'verify_nonce' ), 1 );
 		add_action( 'edd_gateway_' . $this->slug, array( $this, 'process_purchase' ) );
+		add_action( 'plugins_loaded', array( $this, 'init' ), 1 );
 		add_action( 'init', array( $this, 'process_payment_notification' ) );
+	}
 
+	/**
+	 * Functionality after WP Query.
+	 *
+	 * @since 1.0.0
+	 */
+	private function init(){
 		if ( is_admin() && $this->has_settings() ) {
 			add_action( 'edd_settings_sections_gateways', array( $this, 'register_section' ) );
 			add_action( 'edd_settings_gateways', array( $this, 'register_settings' ) );
