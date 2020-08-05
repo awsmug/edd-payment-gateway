@@ -81,7 +81,9 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 			return;
 		}
 
-		foreach ( $this->settings_fields() AS $field_name => $field ) {
+		$settings_fields = $this->settings_fields();
+
+		foreach ( $settings_fields[ $this->slug ] AS $field_name => $field ) {
 			if ( $field['type'] === 'header' || $field['type'] === 'descriptive_text' ) {
 				continue;
 			}
@@ -249,11 +251,13 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 * @since 1.0.0
 	 */
 	protected function has_settings() {
-		if( count( $this->settings_fields() ) === 0 ) {
-			return false;
+		$settings_fields = $this->settings_fields();
+
+		if( array_key_exists( $this->slug, $settings_fields) && count( $settings_fields[ $this->slug ] ) > 0 ) {
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	/**
