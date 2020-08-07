@@ -140,7 +140,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 			'process_purchase',
 			'process_payment_notification',
 			'register_section',
-			'register_settings',
+			'settings_fields',
 			'verify_nonce',
 		]);
 
