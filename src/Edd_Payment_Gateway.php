@@ -363,7 +363,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 			'downloads'    => $purchase_data['downloads'],
 			'user_info'    => $purchase_data['user_info'],
 			'cart_details' => $purchase_data['cart_details'],
-			'gateway'      => static::$name,
+			'gateway'      => $this->slug,
 			'status'       => 'pending'
 		);
 
