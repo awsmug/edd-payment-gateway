@@ -304,7 +304,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 		$payment_data = $this->create_payment_data( $purchase_data );
 		$payment_id = \edd_insert_payment( $payment_data );
 
-		$this->process_payment( $payment_data, $payment_data['post_data'], $payment_id );
+		$this->process_payment( $payment_data, $purchase_data['post_data'], $payment_id );
 	}
 
 	/**
