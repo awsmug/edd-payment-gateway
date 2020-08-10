@@ -387,7 +387,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 			edd_set_payment_transaction_id( $payment_id, $transaction_id );
 		}
 
-		edd_record_log( sprintf( 'Payment succeeded for payment id #%s.', $payment_id ) );
+		$this->log( sprintf( 'Payment succeeded for payment id #%s.', $payment_id ) );
 
 		do_action( 'awsm_edd_payment_complete', $payment_id, $this->slug );
 
@@ -410,7 +410,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 			edd_set_payment_transaction_id( $payment_id, $transaction_id );
 		}
 
-		edd_record_log( sprintf( 'Payment pending for payment id #%s.', $payment_id ) );
+		$this->log( sprintf( 'Payment pending for payment id #%s.', $payment_id ) );
 
 		do_action( 'awsm_edd_payment_pending', $payment_id, $this->slug );
 
@@ -447,15 +447,15 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	protected function payment_error( int $payment_id, string $message, $sendback_checkout = false ) {
 		edd_update_payment_status( $payment_id, 'failed' );
 
-		$message = sprintf( 'Payment error for payment id #%s: %s', $payment_id, $message );
-
 		do_action( 'awsm_edd_payment_error', $payment_id, $this->slug );
 
-		\edd_record_gateway_error( __( 'Payment Error' ), $message, $payment_id );
+		$message = sprintf( 'Payment error for payment id #%s: %s', $payment_id, $message );
+		$this->log( $message, 'error' );
 
 		if ( $payment_id ) {
 			\edd_update_payment_status( $payment_id, 'failed' );
 		}
+
 		if ( $sendback_checkout ) {
 			\edd_send_back_to_checkout( '?payment-mode=' . $this->slug );
 			exit;
@@ -465,7 +465,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	protected function payment_notification_error( $payment_id, $message, $abort = false ) {
 		$log_message = sprintf( 'Payment process error for payment id #%s: %s', $payment_id, $message ) . chr(13);
 
-		edd_record_gateway_error( sprintf( __( '%s Notification Error', 'wpenon' ), $this->slug ), $log_message, $payment_id );
+		$this->log( $log_message, 'error' );
 
 		if ( $abort ) {
 			wp_send_json_error( array( 'message' => $message ), 400 );
@@ -523,5 +523,31 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Logging functionality.
+	 *
+	 * @param string $message Log message.
+	 * @param string $type    Type 'log' or 'error'.
+	 *
+	 * @return mixed ID of the new log entry.
+	 *
+	 * @since 1.0.0
+	 */
+	protected function log( $message, $type = 'log' ) {
+		switch ( $type ) {
+			case 'error':
+				$title = sprintf( 'Error in payment gateway "%s"', $this->name );
+				$log = edd_record_gateway_error( $title, $message );
+				break;
+			case 'log':
+			default:
+				$title = spritf( 'Payment gateway "%s"', $this->name );
+				$log = edd_record_log( $title, $message );
+				break;
+		}
+
+		return $log;
 	}
 }
