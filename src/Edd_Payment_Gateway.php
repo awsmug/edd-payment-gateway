@@ -556,7 +556,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 				break;
 			case 'log':
 			default:
-				$title = spritf( 'Payment gateway "%s"', $this->name );
+				$title = sprintf( 'Payment gateway "%s"', $this->name );
 				$log = edd_record_log( $title, $message );
 				break;
 		}
