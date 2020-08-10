@@ -306,12 +306,16 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 
 		try {
 			$this->process_payment( $payment_data, $purchase_data['post_data'], $payment_id );
+
+			edd_insert_payment_note( $payment_id, sprintf( __( 'Processed payment "%s" with payment gateway "%s"', 'awsm-edd-stripe-sepa' ), $payment_id, $this->name ) );
+			edd_empty_cart();
+			edd_send_to_success_page();
 		} catch ( Validation_Exception $exception ) {
 			edd_set_error( 'validation_failed', $exception->getMessage() );
+			edd_send_back_to_checkout( '?payment-mode=' . $this->slug );
 		} catch ( Gateway_Exception $exception ) {
 			$this->log( $exception->getMessage(), 'error' );
 			edd_set_error( 'payment_failed', __( 'Payment failed. Please try another payment method.', 'awsm-edd-stripe-sepa' ) );
-		} finally {
 			edd_send_back_to_checkout( '?payment-mode=' . $this->slug );
 		}
 	}
