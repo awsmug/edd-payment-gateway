@@ -120,7 +120,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	/**
 	 * Running necessary scripts.
 	 *
-	 * @throws Payment_Exception Exception if name or slug is missng.Payment_Exception
+	 * @throws Gateway_Exception Exception if name or slug is missng.Payment_Exception
 	 *
 	 * @since 1.0.0
 	 */
@@ -129,7 +129,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 		$this->setup();
 
 		if( empty( $this->name ) || empty( $this->slug ) ) {
-			throw new Payment_Exception( 'Payment gateway name or slug must not be empty.' );
+			throw new Gateway_Exception( 'Payment gateway name or slug must not be empty.' );
 		}
 
 		$this->set_hookable_hidden_methods([
@@ -304,7 +304,16 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 		$payment_data = $this->create_payment_data( $purchase_data );
 		$payment_id = \edd_insert_payment( $payment_data );
 
-		$this->process_payment( $payment_data, $purchase_data['post_data'], $payment_id );
+		try {
+			$this->process_payment( $payment_data, $purchase_data['post_data'], $payment_id );
+		} catch ( Validation_Exception $exception ) {
+			edd_set_error( 'validation_failed', $exception->getMessage() );
+		} catch ( Gateway_Exception $exception ) {
+			$this->log( $exception->getMessage(), 'error' );
+			edd_set_error( 'payment_failed', __( 'Payment failed. Please try another payment method.', 'awsm-edd-stripe-sepa' ) );
+		} finally {
+			edd_send_back_to_checkout( '?payment-mode=' . $this->slug );
+		}
 	}
 
 	/**

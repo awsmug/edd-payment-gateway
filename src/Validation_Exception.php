@@ -11,6 +11,6 @@ use Awsm\WP_Wrapper\Exceptions\Exception;
  *
  * @since 1.0.0
  */
-class Payment_Exception extends Exception {
+class Validation_Exception extends Exception {
 
 }
