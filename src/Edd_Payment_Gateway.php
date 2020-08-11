@@ -508,16 +508,6 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 		}
 	}
 
-	protected function payment_notification_error( $payment_id, $message, $abort = false ) {
-		$log_message = sprintf( 'Payment process error for payment id #%s: %s', $payment_id, $message ) . chr(13);
-
-		$this->log( $log_message, 'error' );
-
-		if ( $abort ) {
-			wp_send_json_error( array( 'message' => $message ), 400 );
-		}
-	}
-
 	/**
 	 * Get success url.
 	 *
