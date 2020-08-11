@@ -292,7 +292,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 */
 	private function error_checks( $user, $valid_data, array $post_data ) {
 		try {
-			$this->validate( $user, $valid_data, $post_data );
+			$this->validate( $post_data );
 		} catch ( Validation_Exception $exception ) {
 			edd_set_error( 'validation_failed', $exception->getMessage() );
 		} catch ( Gateway_Exception $exception ) {
@@ -304,13 +304,13 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	/**
 	 * Validate data.
 	 *
-	 * @param $user
-	 * @param $valid_data
-	 * @param array $post_data
+	 * @param array $post_data Posted data to validate.
+	 *
+	 * @throws Validation_Exception Exception on validation.
 	 *
 	 * @since 1.0.0
 	 */
-	protected function validate( $user, $valid_data, $post_data ) {
+	protected function validate( $post_data ) {
 	}
 
 	/**
