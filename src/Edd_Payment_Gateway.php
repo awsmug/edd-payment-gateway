@@ -135,6 +135,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 		$this->set_hookable_hidden_methods([
 			'add_gateway',
 			'checkout_html',
+			'error_checks',
 			'init',
 			'listener',
 			'process_purchase',
@@ -170,6 +171,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 		add_action( 'plugins_loaded', array( $this, 'init' ), 1 );
 		add_action( 'init', array( $this, 'process_payment_notification' ) );
 
+		add_action( 'edd_checkout_user_error_checks', array( $this, 'error_checks' ), 10, 3 );
 		add_action( 'edd_gateway_' . $this->slug, array( $this, 'verify_nonce' ), 1 );
 		add_action( 'edd_gateway_' . $this->slug, array( $this, 'process_purchase' ) );
 		add_action( 'edd_' . $this->slug . '_cc_form', array( $this, 'checkout_html' ) );
@@ -279,6 +281,37 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	protected function checkout_scripts() {
 	}
 
+	/**
+	 * Error checking.
+	 *
+	 * @param $user
+	 * @param $valid_data
+	 * @param array $post_data
+	 *
+	 * @since 1.0.0
+	 */
+	private function error_checks( $user, $valid_data, array $post_data ) {
+		try {
+			$this->validate( $user, $valid_data, $post_data );
+		} catch ( Validation_Exception $exception ) {
+			edd_set_error( 'validation_failed', $exception->getMessage() );
+		} catch ( Gateway_Exception $exception ) {
+			$this->log( $exception->getMessage(), 'error' );
+			edd_set_error( 'payment_failed', __( 'Payment failed. Please try another payment method.', 'awsm-edd-payment-gateway' ) );
+		}
+	}
+
+	/**
+	 * Validate data.
+	 *
+	 * @param $user
+	 * @param $valid_data
+	 * @param array $post_data
+	 *
+	 * @since 1.0.0
+	 */
+	protected function validate( $user, $valid_data, $post_data ) {
+	}
 
 	/**
 	 * Nonce verification.
@@ -287,7 +320,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 */
 	private function verify_nonce( array $purchase_data ) {
 		if ( ! wp_verify_nonce( $purchase_data['gateway_nonce'], 'edd-gateway' ) ) {
-			wp_die( __( 'Nonce verification has failed', 'easy-digital-downloads' ), __( 'Error', 'easy-digital-downloads' ), array( 'response' => 403 ) );
+			wp_die( __( 'Nonce verification has failed', 'easy-digital-downloads' ), __( 'Error', 'awsm-edd-payment-gateway' ), array( 'response' => 403 ) );
 		}
 	}
 
@@ -307,7 +340,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 		try {
 			$this->process_payment( $payment_data, $purchase_data['post_data'], $payment_id );
 
-			edd_insert_payment_note( $payment_id, sprintf( __( 'Processed payment "%s" with payment gateway "%s"', 'awsm-edd-stripe-sepa' ), $payment_id, $this->name ) );
+			edd_insert_payment_note( $payment_id, sprintf( __( 'Processed payment "%s" with payment gateway "%s"', 'awsm-edd-payment-gateway' ), $payment_id, $this->name ) );
 			edd_empty_cart();
 			edd_send_to_success_page();
 		} catch ( Validation_Exception $exception ) {
@@ -315,7 +348,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 			edd_send_back_to_checkout( '?payment-mode=' . $this->slug );
 		} catch ( Gateway_Exception $exception ) {
 			$this->log( $exception->getMessage(), 'error' );
-			edd_set_error( 'payment_failed', __( 'Payment failed. Please try another payment method.', 'awsm-edd-stripe-sepa' ) );
+			edd_set_error( 'payment_failed', __( 'Payment failed. Please try another payment method.', 'awsm-edd-payment-gateway' ) );
 			edd_send_back_to_checkout( '?payment-mode=' . $this->slug );
 		}
 	}
