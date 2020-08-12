@@ -381,6 +381,19 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	}
 
 	/**
+	 * Retrieve the payment ID based on the transaction ID.
+	 *
+	 * @param string $key The transaction ID to search for.
+	 *
+	 * @return int Payment ID.
+	 *
+	 * @since 1.0.0
+	 */
+	protected function get_payment_id_by_transaction_id( $transaction_id ) {
+		return edd_get_purchase_id_by_transaction_id( $transaction_id );
+	}
+
+	/**
 	 * Listening to incoming requests.
 	 *
 	 * @since 1.0.0
