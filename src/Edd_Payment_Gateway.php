@@ -435,91 +435,38 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 * Payment complete.
 	 *
 	 * @param int  $payment_id     Payment id.
-	 * @param null $transaction_id Transaction id.
-	 * @param null $redirect_to    Redirect url.
 	 *
 	 * @since 1.0.0
 	 */
-	protected function payment_complete( int $payment_id, int $transaction_id = null, string $redirect_to = null ) {
+	protected function payment_complete( int $payment_id ) {
 		edd_update_payment_status( $payment_id, 'publish' );
-
-		if ( $transaction_id ) {
-			edd_set_payment_transaction_id( $payment_id, $transaction_id );
-		}
-
 		$this->log( sprintf( 'Payment succeeded for payment id #%s.', $payment_id ) );
-
 		do_action( 'awsm_edd_payment_complete', $payment_id, $this->slug );
-
-		$this->purchase_complete( $payment_id, $redirect_to );
 	}
 
 	/**
 	 * Payment complete.
 	 *
 	 * @param int  $payment_id     Payment id.
-	 * @param int $transaction_id Transaction id.
-	 * @param int $redirect_to    Redirect url.
 	 *
 	 * @since 1.0.0
 	 */
-	protected function payment_pending( int $payment_id, int $transaction_id = null, string $redirect_to = null ) {
+	protected function payment_pending( int $payment_id ) {
 		edd_update_payment_status( $payment_id, 'pending' );
-
-		if ( $transaction_id ) {
-			edd_set_payment_transaction_id( $payment_id, $transaction_id );
-		}
-
 		$this->log( sprintf( 'Payment pending for payment id #%s.', $payment_id ) );
-
 		do_action( 'awsm_edd_payment_pending', $payment_id, $this->slug );
-
-		$this->purchase_complete( $payment_id, $redirect_to );
-	}
-
-	/**
-	 * Completing purchase.
-	 *
-	 * @param int         $payment_id  Payment id.
-	 * @param string|null $redirect_to Redirect url.
-	 *
-	 * @since 1.0.0
-	 */
-	private function purchase_complete( int $payment_id, string $redirect_to = null ) {
-		edd_empty_cart();
-
-		if ( $redirect_to ) {
-			wp_redirect( $redirect_to );
-			exit;
-		} else {
-			edd_send_to_success_page();
-		}
 	}
 
 	/**
 	 * Payment error.
 	 *
 	 * @param int $payment_id Payment id.
-	 * @param string $message Payment message.
-	 *
-	 * @param bool $sendback_checkout Send back to checkout
+	 * @param bool $sendback_checkout Send back to checkout.
 	 */
-	protected function payment_error( int $payment_id, string $message, $sendback_checkout = false ) {
+	protected function payment_failed( int $payment_id ) {
 		edd_update_payment_status( $payment_id, 'failed' );
-
-		do_action( 'awsm_edd_payment_error', $payment_id, $this->slug );
-
-		$message = sprintf( 'Payment error for payment id #%s: %s', $payment_id, $message );
-		$this->log( $message, 'error' );
-
-		if ( $payment_id ) {
-			\edd_update_payment_status( $payment_id, 'failed' );
-		}
-
-		if ( $sendback_checkout ) {
-			\edd_send_back_to_checkout( '?payment-mode=' . $this->slug );
-			exit;
-		}
+		$this->log( sprintf( 'Payment pending for payment id #%s.', $payment_id ) );
+		do_action( 'awsm_edd_payment_failed', $payment_id, $this->slug );
 	}
 
 	/**
