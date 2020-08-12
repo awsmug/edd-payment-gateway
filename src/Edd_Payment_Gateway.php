@@ -367,6 +367,20 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	public abstract function process_payment( array $purchase_data, array $post_data, int $payment_id );
 
 	/**
+	 * Sets a Transaction ID in post meta for the given Payment ID.
+	 *
+	 * @param int    $payment_id     Payment ID.
+	 * @param string $transaction_id The transaction ID from the gateway.
+	 *
+	 * @return mixed Meta ID if successful, false if unsuccessful.
+	 *
+	 * @since 1.0.0
+	 */
+	protected function set_payment_transaction_id( $payment_id, $transaction_id ) {
+		return edd_set_payment_transaction_id( $payment_id, $transaction_id );
+	}
+
+	/**
 	 * Listening to incoming requests.
 	 *
 	 * @since 1.0.0
