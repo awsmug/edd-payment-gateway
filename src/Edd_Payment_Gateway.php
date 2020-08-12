@@ -555,7 +555,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 */
 	protected function get_listener_url() {
 		if ( ! empty( $this->slug ) ) {
-			return home_url( '/edd-listener/' . $this->slug . '/' );
+			return add_query_arg( 'edd-listener', $this->slug, home_url() );
 		}
 
 		return false;
