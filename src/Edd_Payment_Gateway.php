@@ -291,6 +291,10 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 * @since 1.0.0
 	 */
 	private function error_checks( $user, $valid_data, array $post_data ) {
+		if ( $post_data['payment-mode'] !== $this->slug ) {
+			return;
+		}
+
 		try {
 			$this->validate( $post_data );
 		} catch ( Validation_Exception $exception ) {
