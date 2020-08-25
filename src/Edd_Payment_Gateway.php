@@ -404,13 +404,15 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 */
 	private function process_payment_notification() {
 		if ( isset( $_GET['edd-listener'] ) && $_GET['edd-listener'] === $this->slug ) {
-			$input = @file_get_contents( 'php://input' );
+			$input = file_get_contents( 'php://input' );
 
-			if ( empty( $input ) ) {
-				$this->payment_error( null, __( 'Missing POST data.', 'wpenon' ), true );
+			if ( $input ) {
+				$this->payment_listener( $input );
+				return;
 			}
 
-			$this->payment_listener( $input );
+			$this->payment_error( null, __( 'Missing POST data.', 'wpenon' ), true );
+			return;
 		}
 	}
 
