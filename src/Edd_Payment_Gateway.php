@@ -5,7 +5,7 @@ namespace Awsm\Edd\Payment;
 use Awsm\WP_Wrapper\Interfaces\Actions;
 use Awsm\WP_Wrapper\Interfaces\Filters;
 use Awsm\WP_Wrapper\Interfaces\Task;
-use Awsm\WP_Wrapper\Traits\Hookable_Hidden_Methods;
+use Awsm\WP_Wrapper\Traits\Hookable_Hidden_Methods_Trait;
 
 /**
  * Class Edd_Payment_Gateway.
@@ -15,7 +15,7 @@ use Awsm\WP_Wrapper\Traits\Hookable_Hidden_Methods;
  * @sine 1.0.0
  */
 abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
-	use Hookable_Hidden_Methods;
+	use Hookable_Hidden_Methods_Trait;
 
 	/**
 	 * Gateway name.
