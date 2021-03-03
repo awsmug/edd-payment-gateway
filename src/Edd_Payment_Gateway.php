@@ -156,6 +156,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 */
 	public function add_filters() {
 		add_filter( 'edd_payment_gateways', array( $this, 'add_gateway' ) );
+		add_filter( 'edd_payment_confirm_' . $this->slug,  array( $this, 'confirmation_page' ) );
 
 		if ( is_admin() && $this->has_settings() ) {
 			add_filter( 'edd_settings_gateways', array( $this, 'settings_fields' ) );
@@ -448,6 +449,27 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 		);
 
 		return array_merge( $payment_data, $additional_data );
+	}
+
+	/**
+	 * Output confirmation page content.
+	 * 
+	 * @param string $content Content of confirmation page. Can be overwritten by child class.
+	 * 
+	 * @since 1.0.0
+	 */
+	public function confirmation_page ( $content ) {
+		if ( ! isset( $_GET['payment-id'] ) && ! edd_get_purchase_session() ) {
+			return $content;
+		}
+	
+		edd_empty_cart();	
+
+		ob_start();
+		edd_get_template_part( 'payment', 'processing' );
+		$content = ob_get_clean();
+	
+		return $content;	
 	}
 
 	/**
