@@ -346,11 +346,9 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 			$this->process_payment( $payment_data, $purchase_data['post_data'], $payment_id );
 
 			edd_insert_payment_note( $payment_id, sprintf( __( 'Processed payment "%s" with payment gateway "%s"', 'awsm-edd-payment-gateway' ), $payment_id, $this->name ) );
-			edd_empty_cart();
 
-			wp_redirect( $this->get_success_url() );
+			wp_redirect( $this->get_success_url( $payment_id ) );
 			exit;
-
 		} catch ( Validation_Exception $exception ) {
 			edd_set_error( 'validation_failed', $exception->getMessage() );
 			edd_send_back_to_checkout( '?payment-mode=' . $this->slug );
