@@ -482,7 +482,6 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 */
 	protected function payment_complete( int $payment_id ) {
 		edd_update_payment_status( $payment_id, 'publish' );
-		$this->log( sprintf( 'Payment succeeded for payment id #%s.', $payment_id ) );
 		do_action( 'awsm_edd_payment_complete', $payment_id, $this->slug );
 	}
 
@@ -495,7 +494,6 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 */
 	protected function payment_pending( int $payment_id ) {
 		edd_update_payment_status( $payment_id, 'pending' );
-		$this->log( sprintf( 'Payment pending for payment id #%s.', $payment_id ) );
 		do_action( 'awsm_edd_payment_pending', $payment_id, $this->slug );
 	}
 
@@ -507,7 +505,7 @@ abstract class Edd_Payment_Gateway implements Actions, Filters, Task {
 	 */
 	protected function payment_failed( int $payment_id ) {
 		edd_update_payment_status( $payment_id, 'failed' );
-		$this->log( sprintf( 'Payment pending for payment id #%s.', $payment_id ) );
+		$this->log( sprintf( 'Payment failed for payment id #%s.', $payment_id ) );
 		do_action( 'awsm_edd_payment_failed', $payment_id, $this->slug );
 	}
 
